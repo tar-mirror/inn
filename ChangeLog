@@ -1,0 +1,489 @@
+2016-11-27  iulius
+
+	* Bump version for the new 2.6.1 release
+
+	* Update to latest rra-c-util and C TAP Harness upstream versions
+
+	* Reorder compression-related items in NEWS
+
+2016-11-26  iulius
+
+	* Fix use of calloc() without checking for a return value of NULL
+	  
+	  Thanks to Bill Parker for the bug report.
+
+2016-11-25  iulius
+
+	* Use a buffer properly for Site.FNLnames
+	  
+	  We were using a buffer to store the space-separated list of feed
+	  names to which a funnel feed was being sent, but only by directly
+	  manipulating the underlying struct with (incorrect) uses of
+	  strlcpy and strlcat. Use the buffer API to manipulate this
+	  structure correctly, and fix up the other places where "used" was
+	  incorrectly used as the length of data in the buffer instead of
+	  "left".
+
+2016-11-23  iulius
+
+	* Fix build when SASL support is enabled but not TLS support
+
+2016-11-09  iulius
+
+	* Fix incorrect use of boolean values
+	  
+	  Thanks to David Binderman for the bug report.
+
+2016-11-06  iulius
+
+	* Fix build when SASL support is enabled but not TLS support
+
+	* Update LICENSE and doc, preparing the next release
+
+	* Update to latest upstream version of rra-c-util
+	  
+	  Work around warning bug in older gcc with snprintf.
+	  
+	  Properly handle signed overflow in run_child_function.
+	  
+	  Correctly handle -Wno-* options in INN_PROG_CC_FLAG. GCC and
+	  Clang both don't produce fatal errors for unknown -Wno-* flags,
+	  so test the corresponding positive -W flag instead when
+	  determining if they're supported.
+
+	* Bump version information for our libraries released with INN
+	  2.6.1
+
+	* Allow 2^31 - 1 as a valid result from df
+	  
+	  Latest version of OSX answers 2^31 - 1, so allow it similarly to
+	  2^32 - 1 that already was allowed.
+
+2016-11-04  iulius
+
+	* Fix weird !strcmp == 0 construct
+	  
+	  Thanks to The Doctor for the report.
+
+	* Update to latest rra-c-util version
+	  
+	  Notably:
+	  
+	  Correct the return-value checks for snprintf to avoid an
+	  off-by-one error when verifying the output was not truncated.
+	  (All locations should have been safe anyway for other reasons,
+	  but be certain.) Based on a patch by Yuriy M. Kaminskiy.
+	  
+	  Add more debugging information to network/server test.
+	  
+	  Fix incorrect use of IPv6 protocol in IPv4 test.
+	  
+	  When testing network_set_reuseaddr and related functions, don't
+	  require that the option be set to 1 explicitly, just that it has
+	  a true value. Debian/kFreeBSD returns the numeric value of the
+	  socket option in some cases when the socket option is set rather
+	  than returning 1, and POSIX just documents that this is a boolean
+	  flag (so only the truthfulness of the value matters).
+	  
+	  Increase the buffer size of the network write timeout test: the
+	  default Debian cloud images use a 12MB TCP sending buffer, which
+	  meant that the timeout test never triggered because the entire
+	  write of 8MB was absorbed by the buffer. Bump the buffer size to
+	  15MB and add a comment explaining why that number was chosen,
+	  with a reference to the Debian bug where the Ruby maintainers
+	  sorted this out. Many thanks to Lucas Nussbaum for investigating
+	  this and to Eric Wong for sorting out why this buffer was causing
+	  tests to fail.
+
+	* Update to latest upstream rra-c-util
+	  
+	  Notably, change inet_ntoa replacement prototype to match POSIX.
+	  While having a const arg and a const return value is more
+	  correct, make the prototype of the replacement function exactly
+	  match POSIX for fewer surprises when the replacement is used.
+
+	* Use cc-flags.m4 from upstream rra-c-util
+
+	* Update to latest control.ctl upstream file
+	  
+	  Handle reserved hierarchies, and the new key for the dictator.*
+	  hierarchy.
+
+	* Update pgpverify and signcontrol to their latest upstream version
+
+	* Update concat library to its latest version in rra-c-util
+
+	* Fix all non-https www.eyrie.org URLs
+
+	* Mark these files as now unmaintained in rra-c-util
+
+	* Use https instead of ftp URLs for ftp.isc.prg
+
+	* Update to Libtool 2.4.6
+	  
+	  As INN relies on the Debian libtool distribution, the 2.4.6-2
+	  package used already contains the fix for m4 slowness (absent
+	  from the official 2.4.6 upstream release).
+	  
+	  Also update HACKING to mention the new directories used for
+	  2.4.6.
+
+	* Update config.guess and config.sub from upstream
+
+	* Update config.guess and config.sub from upstream
+
+	* Update install-sh from upstream
+
+	* Update a few URLs to use https instead of http
+
+2016-11-03  eagle
+
+	* Relax permission checks in nnrpd for TLS private key
+	  
+	  Second-guessing whether we can read the file can get us in
+	  trouble if file system ACLs are in use, and requiring the group
+	  match the group of nnrpd makes it harder than necessary to set up
+	  automatic certificate renewal via something like Let's Encrypt.
+	  Relax the permission checks to just check that the private key
+	  isn't world-readable and that we can read it.
+
+2016-10-08  iulius
+
+	* SASL mechanisms and compression algorithms are case-sensitive
+	  
+	  Only upper case is allowed.
+
+	* Fix Perl warning when Sys::Syslog version is not numeric Change
+	  "<" to "lt" to avoid the following warning: Argument "0.33_01"
+	  isn't numeric in numeric lt (<)
+
+2016-09-17  iulius
+
+	* nnrpd: add syntax checks at injection time for header fields
+	  
+	  Control chars and empty content lines in header fields are now
+	  rejected by nnrpd at injection time.
+	  
+	  Add two new functions IsValidHeaderBody() and
+	  IsValidHeaderField() in libinn, along with a test suite.
+
+2016-09-04  iulius
+
+	* Return the right value in TMRsumone() when the timer log exceeds
+	  the buffer size
+	  
+	  Thanks to Yuriy M. Kaminskiy for the patch.
+
+	* Fix build for OpenSSL versions prior to 0.9.8m
+	  
+	  SSL_CTX_clear_options() was added to OpenSSL 0.9.8m.
+	  
+	  Also, when building with warnings on, enable the check on
+	  deprecated OpenSSL interfaces.
+
+	* Homogenize the use of TLS/SSL in documentation
+	  
+	  Also, when TLS-level compression is wanted, or server preferences
+	  should be followed, be sure it is the case (if OpenSSL supports
+	  it).
+
+	* Improve the robustness of snprintf handling
+	  
+	  snprintf() returns -1 on error, and *value larger than supplied
+	  buffer size* if formatted string will not fit in supplied buffer.
+	  If you add/subtract snprintf() return value without validating
+	  its range, this will lead up to disaster.
+	  
+	  Thanks to Yuriy M. Kaminskiy for the patch.
+
+	* Improve wording about C flag in newsfeeds
+
+	* Fix initialization of CAF header (LastCleaned was not
+	  initialized)
+
+2016-08-05  iulius
+
+	* Disable TLS-level compression by default in inn.conf
+
+2016-08-04  iulius
+
+	* Improve syntax checking for the COMPRESS command
+	  
+	  Add 501 response codes when appropriate.
+
+	* Suppresses compiler warnings when built on systems without the
+	  relevant defines
+	  
+	  Patch from upstream rra-c-util.
+
+	* Add missing prototypes for replacement functions
+
+2016-07-31  iulius
+
+	* Fix the build on old GCC versions
+	  
+	  To build with GCC "-Wformat-nonliteral" warning on, [9911]
+	  suppressed a few checks in the code, waiting to be properly
+	  fixed. However, these pragmas are not understood by old GCC
+	  versions (4.4.7 for instance). So this commit suppresses these
+	  pragmas.
+	  
+	  They are scheduled to be fixed in a later release of INN.
+
+2016-06-01  iulius
+
+	* Allow posts containing a Received: or a Posted: header field
+
+	* Advertise XBATCH and XPAT in the capabilities list
+
+2016-05-28  iulius
+
+	* Fix the build with Perl and large-file support
+	  
+	  It was a regression introduced with commit [10023].
+
+2016-05-05  iulius
+
+	* sys2nf: fix resource leak if the first condition is true
+
+	* Protect $Id$ in support scripts
+
+	* Add missing va_end to is_double
+	  
+	  Fix missing va_end() call in is_double(), which would have caused
+	  compilation failures or other problems on some platforms.
+	  
+	  Patch taken from upstream C TAP Harness.
+
+	* Update to latest C TAP Harness upstream version
+
+	* Update to latest rra-c-util upstream version
+	  
+	  The portable replacements for strlcat and strlcpy are no longer
+	  maintained in rra-c-util. These had various bugs around edge
+	  cases and should normally be replaced with asprintf or similar
+	  functions. Rewrite vector_join and cvector_join to use memcpy
+	  instead of strlcpy and strlcat.
+	  
+	  Also improve how IPv6 is handled in the network test suite.
+
+	* Fix build with OpenSSL 1.1.0 - a few X509_xxx types are now
+	  opaque
+	  
+	  Check that the current certificate returned by
+	  X509_STORE_CTX_get_current_cert() is not NULL. In the switch
+	  part, err_cert is not NULL though because otherwise the error
+	  would have been different than
+	  X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT.
+
+	* Use perl.m4 from upstream rra-c-util
+	  
+	  Move INN-specific stuff to configure.ac.
+
+	* feedone: fix log output when exiting after an error
+
+	* Update to latest rra-c-util upstream version
+	  
+	  As network_set_freebind, network_set_reuseaddr, and
+	  network_set_v6only are now public functions, they can be removed
+	  from our local network-innbind.c file.
+
+	* Remove stdin flushing
+	  
+	  Even though it arguably has defined behaviur, actsync is not
+	  actually relying on it.
+
+	* Fix an implicit declaration of function 'time'
+
+	* Fix leaks and dereferences; improve readability (reported by
+	  cppcheck)
+
+	* Fix unused variables
+
+	* sys2nf: Remove extra parameter
+
+	* Missing fclose() and mishandling of *artnum
+
+	* Unsigned integers cannot be negative (reported by cppcheck)
+
+	* Fix the computation of sizeof(buf) for fgets()
+
+	* Remove redundant or useless code (reported by cppcheck)
+
+	* PERMreadlist and PERMpostlist are not booleans
+
+	* confparse.c: fix the message error when opening braces are
+	  missing
+	  
+	  tag was always NULL in the condition.
+
+	* Fix signedness in printf-like statements (reported by cppcheck)
+
+2016-04-03  iulius
+
+	* authprogs/radius.c: fix support for multiple radius servers
+
+2016-03-28  iulius
+
+	* Add support for OpenSSL 1.1.0
+
+	* nnrpd: keep TCP_NODELAY only for BSD/OS systems
+	  
+	  Fixed slow nnrpd responses for a few NNTP commands. The
+	  TCP_NODELAY option was unconditionally set whereas only BSD/OS
+	  systems needed it. Modern networking stacks do not need such
+	  tweaks.
+	  
+	  Thanks to Christian Mock for having discovered that.
+
+2016-01-10  iulius
+
+	* rnews: fix a segfault while starting setuid news
+	  
+	  It is a regression introduced with commit [9854]. Previously,
+	  rnews called get_news_uid_gid() that handled the possibility of
+	  inn.conf not having been read. Since that commit, rnews has been
+	  calling ensure_news_user() that does not handle that case.
+	  Especially, when --enable-uucp-rnews was used at configure time,
+	  the effective UID returned by geteuid() was not root, and rnews
+	  segfaulted.
+	  
+	  Thanks to Marcus Jodorf for the bug report.
+
+2015-12-11  iulius
+
+	* Properly cast size_t to unsigned long when printf'ing them as %lu
+
+	* Initial implementation of the COMPRESS command in INN
+	  
+	  Based on draft-murchison-nntp-compress-02 (still not published as
+	  an RFC).
+	  
+	  The COMPRESS command is an extension to the NNTP protocol to
+	  allow a connection to be effectively and efficiently compressed.
+	  News clients that also support that extension will be able to
+	  benefit from that bandwidth optimization and improvement in
+	  speed.
+	  
+	  Initial implementation in INN contributed by Julien Elie.
+
+2015-12-10  iulius
+
+	* Improve wording around encryption layers
+	  
+	  Keep in mind that two kinds of security layers can be negotiated
+	  (TLS and SASL).
+
+	* SASL: fix the detection of the negotiation of a security layer
+	  
+	  nnrpd was wrongly discarding any knowledge from the client when
+	  an SASL data integrity layer without encryption was negotiated.
+	  
+	  Note that the patch also makes nnrpd no longer believe the
+	  connection is encrypted in such cases, for use with require_ssl
+	  auth blocks in readers.conf. This fix is not mentioned in NEWS
+	  because that behaviour for require_ssl is not yet released (new
+	  in INN 2.6.1).
+
+	* Update to latest 5.9 release of rra-c-util
+	  
+	  Just a typo in a comment.
+
+	* Improve the robustness of SASL handling
+	  
+	  After sasl_decode(), add a check to prevent a call to memcpy()
+	  for 0 byte or for more bytes than the destination buffer.
+	  
+	  Check that sasl_errdetail() does not return NULL.
+	  
+	  Improve a few comments in the source code.
+
+	* Support older versions of OpenSSL (up to v0.9.8) to disable TLS
+	  compression
+	  
+	  The tlscompression parameter in inn.conf now works for OpenSSL
+	  versions superior to v0.9.8.
+
+	* Use -0000 instead of +0000 as the time zone in generated headers
+	  not at Universal Time
+	  
+	  nnrpd now uses -0000 as the time zone for Date: and
+	  Injection-Date: header fields it generates. It was previously
+	  using +0000, wrongly systematically indicating a local time zone
+	  at Universal Time when the localtime paramater is set to false
+	  (which is the default) in readers.conf. The +0000 time zone will
+	  now be used only if localtime is set to true and UTC is really
+	  the local time zone of the server.
+	  
+	  Improve the documentation of readers.conf, mentioning a use case
+	  for the localtime parameter. Thanks to Russ for it.
+	  
+	  convdate now similarly also uses -0000.
+
+	* nnrpd: take into account the require_ssl parameter when using
+	  SASL
+	  
+	  When an encryption layer is negotiated after a successful
+	  authentication using a SASL mechanism which negotiates an
+	  encrypted layer, nnrpd now updates the permissions of the news
+	  client according to the new secure state of his connection (that
+	  is to say auth blocks in readers.conf using the require_ssl
+	  parameter are taken into account). Previously, only TLS
+	  connections either on a dedicated port (usually 563) or after a
+	  successful use of STARTTLS were taking benefit from that
+	  parameter.
+
+	* nntpsend: correctly exit after all of the child processes exit
+	  
+	  The documentation for nntpsend claims that it waits until all of
+	  the child innxmit processes exit before it does, but it doesn't.
+	  
+	  The reason it does not is because it starts the innxmit
+	  processes, or more accurately the subshells that start the
+	  innxmit processes, in a while loop that is itself in a child
+	  process of the main shell, because of this line:
+	  
+	  cat ${INPUT} | while read SITE HOST SIZE_ARG FLAGS; do
+	  
+	  Since the while loop is in a pipe, it's executed in a child
+	  process. As a result, its child processes, i.e., the ones running
+	  innxmit, are not direct children of the nntpsend shell script's
+	  process, so it doesn't wait for them.
+	  
+	  Note that this bug causes nntpsend to fail to work properly on
+	  systems that use systemd, because when nntpsend exits
+	  prematurely, systemd kills all of the processes it launched,
+	  including the innxmit processes.
+	  
+	  Thanks to Jonathan Kamens for the patch.
+
+	* nntpget: NEWNEWS accepts 4-digit years
+	  
+	  Hopefully NNTP specification is Y2K-compliant and allows 4-digit
+	  years for the NEWNEWS command. Fix nntpget to use that syntax.
+
+	* Add some more release instructions to HACKING
+	  
+	  Document more on pushing releases to ftp.isc.org. Mention
+	  updating Russ's unofficial web site, which contains the
+	  autogenerated HTML versions of the documentation.
+
+	* nnrpd: take into account the require_ssl parameter when using
+	  STARTTLS
+	  
+	  When TLS is negotiated after a successful use of the STARTTLS
+	  command, nnrpd now updates the permissions of the news client
+	  according to the new secure state of his connection (that is to
+	  say auth blocks in readers.conf using the require_ssl parameter
+	  are taken into account). Previously, only connections on a
+	  dedicated port (usually 563) were taking benefit from that
+	  parameter.
+	  
+	  Thanks to Steve Crook for the bug report.
+
+2015-09-12  iulius
+
+	* Bump revision numbers in STABLE to reflect the next release
+
+	* Bumping revision numbers in TODO should be done earlier in the
+	  release process
